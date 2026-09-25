@@ -111,8 +111,7 @@ Before starting the loop, check repository state:
 
 When the loop reaches any terminal outcome:
 
-- Stage the file changes made by the loop before the terminal notification and
-  final response.
+- Stage the file changes made by the loop before the final response.
 - Preserve the pre-loop staged baseline. The final index may contain both the
   original staged changes and loop-owned changes that build on them.
 - Stage only the loop's own new paths or hunks beyond the recorded baseline.
@@ -192,43 +191,9 @@ stop and report the remaining findings or source of churn.
 
 ## Notifications
 
-The review loop owns notifications because it owns cycle count, clean review
-count, verification status, commit status, and terminal outcome.
-
-Use `agent-notify` for workflow notifications. Do not call raw backend
-notifiers directly.
-
-Send exactly one terminal notification after the loop stops. Pass each
-notification line as a separate `agent-notify` argument: line 1 is
-`code-review: STATUS`, and line 2 is the concise details. Do not add a
-`skillz:` prefix.
-
-If the user explicitly asks for per-round notifications, send exactly one
-`agent-notify` notification after each review cycle, including cycle count,
-status, clean-review count, and whether fixes or verification ran.
-
-Use simple quoted arguments only. Do not use ANSI-C `$'...\n...'` quoting,
-heredocs, command substitution, pipes, `&&`, `||`, command separators such as
-`;`, or shell variable expansion for notification commands; those shell
-features can trigger sandbox approval when a direct `agent-notify` invocation
-would not. Keep notification text itself free of shell control characters; use
-commas or plain words in detail lines.
-
-If `agent-notify` fails because of sandboxed network access or notifier access,
-rerun the same direct invocation with escalation. If `agent-notify` still
-fails, report that notification could not be sent in the final response.
-
-Examples:
-
-```sh
-agent-notify 'code-review: round 4/15 NEEDS_WORK' 'fixed 2 High findings, clean reviews reset'
-agent-notify 'code-review: round 7/15 PASS' 'clean reviews 1/5, verification pending'
-agent-notify 'code-review: CONVERGED' 'clean reviews 5/5, cycles 11/15'
-agent-notify 'code-review: INSUFFICIENT_EVIDENCE' 'missing surrounding production code, cycles 2/15'
-agent-notify 'code-review: MAX_CYCLES' 'remaining High findings, cycles 15/15'
-```
-
-Do not send per-round notifications unless the user explicitly asks for them.
+The loop sends no notifications of its own. Leave them to the host
+environment, for example Claude Code hooks that fire when the session stops or
+needs input.
 
 ## Final response
 
