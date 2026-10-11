@@ -125,7 +125,7 @@ ARGV.each do |arg|
 end
 
 paths = if paths.empty?
-  staged ? staged_skill_paths(repo_root) : Dir.chdir(repo_root) { Dir.glob("*/SKILL.md").sort }
+  staged ? staged_skill_paths(repo_root) : Dir.chdir(repo_root) { Dir.glob("skills/*/SKILL.md").sort }
 else
   paths.sort
 end
